@@ -7,9 +7,11 @@ const { ECSClient, RunTaskCommand } = require("@aws-sdk/client-ecs")
 const { Server } = require('socket.io')
 const Redis = require('ioredis')
 
-const subscriber = new Redis("rediss://default:AVNS_kO-aNMqbhnkdkGi9N5S@redis-b2160cd-vaibhavwateam-0bb0.a.aivencloud.com:15904")
+const subscriber = new Redis("<< REDIS URL GOES HERE >>")
 const io = new Server({ cors: '*' });
 
+
+// On connection emit the message
 io.on('connection', socket => {
     socket.on('subscribe', channel => {
         socket.join(channel)
@@ -17,23 +19,26 @@ io.on('connection', socket => {
     })
 })
 
+// Start socket.io
 io.listen(5002, console.log("socket server 9001..."))
 
-
+// Connect to ecsClient
 const ecsClient = new ECSClient({
-    region: 'ap-south-1',
+    region: '<<YOUR_REGION>>',
     credentials: {
-        accessKeyId: 'AKIARFPSHFLDBFML4RPE',
-        secretAccessKey: '2khZziWHRdaTrYnSKjfF+w0G41VFKxCXh2oJ6XSH'
+        accessKeyId: '<<ACCESSKEYID>>',
+        secretAccessKey: '<<YOUR_SECRET_ACCESS_KEY>>'
     }
 })
 
+// YOUR Cluster and task ARN
 const config = {
-    CLUSTER: "arn:aws:ecs:ap-south-1:080501746374:cluster/build-cluster",
-    TASK: "arn:aws:ecs:ap-south-1:080501746374:task-definition/builder-task"
+    CLUSTER: "<<YOUR_CLUSTER_ARN>>",
+    TASK: "<<YOUR_TASK_ARN>>"
 }
 
 
+// Listen on /project route
 app.use('/project', async (req, res) => {
     const slugword = generateSlug();
     const { GitURL } = req.body;
@@ -46,14 +51,14 @@ app.use('/project', async (req, res) => {
         networkConfiguration: {
             awsvpcConfiguration: {
                 assignPublicIp: "ENABLED",
-                subnets: ['subnet-0e4c73e2e518ee82c', 'subnet-016aa1b18228fbed7', 'subnet-087f0767af471e7dd'],
-                securityGroups: ['sg-099fd7762fcde6c08']
+                subnets: ['<<SUBNETS>>', '<<SUBNETID>>', '<<SUBNETID>>'],
+                securityGroups: ['<<SECURITYGROUP>>']
             }
         },
         overrides: {
             containerOverrides: [
                 {
-                    name: 'builder-image',
+                    name: '<<IMAGENAME>>',
                     environment: [
                         { name: 'GIT_REPO_URL', value: GitURL },
                         { name: 'PROJECT_ID', value: slugword }
@@ -63,18 +68,23 @@ app.use('/project', async (req, res) => {
         }
     })
 
+    // Send the command query
     await ecsClient.send(command);
-    return res.status(200).json({ status: "queued", data: { slugword, url: `http://${slugword}/localhost:9000` } })
+    return res.status(200).json({ status: "queued", data: { slugword, url: `http://${slugword}/localhost:5001` } })
 })
 
+// Subscribe to logs and stream the logs
 async function initRedisSubscribe() {
     console.log('Subscribed to logs....')
     subscriber.psubscribe('logs:*')
     subscriber.on('pmessage', (pattern, channel, message) => {
+        // Emit the message
         io.to(channel).emit('message', message)
     })
 }
+// Call this functions
 initRedisSubscribe();
 
 
+// Listen on this server...
 app.listen(5000, console.log("API SERVER RUNNING ON 5000..."))
