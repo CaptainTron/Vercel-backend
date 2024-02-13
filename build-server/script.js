@@ -3,26 +3,31 @@ const path = require('path');
 const fs = require('fs')
 const mime = require('mime-types');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
+// EXPORT .env file
 require('dotenv').config();
 
-
+// CONNECT to REDIS SERVER
 const Redis = require("ioredis");
-const publisher = new Redis(`rediss://default:AVNS_kO-aNMqbhnkdkGi9N5S@redis-b2160cd-vaibhavwateam-0bb0.a.aivencloud.com:15904`)
+// CREATE A PUBLISHER
+const publisher = new Redis(`<< REDIS URL GOES HERE >>`)
 
 
 
 
-
+// Connect to S3 Bucket
 const s3Client = new S3Client({
-    region: 'ap-south-1',
+    region: '<<YOUR_REGION>>',
     credentials: {
-        accessKeyId: 'AKIARFPSHFLDBFML4RPE',
-        secretAccessKey: '2khZziWHRdaTrYnSKjfF+w0G41VFKxCXh2oJ6XSH'
+        accessKeyId: '<<ACCESSKEYID>>',
+        secretAccessKey: '<<YOUR_SECRET_ACCESS_KEY>>'
     }
 })
 
+// Get project ID
 const PROJECT_ID = process.env.PROJECT_ID
 
+
+// Publish the logs
 function publishLog(log) {
     publisher.publish(`logs:${PROJECT_ID}`, JSON.stringify({ log }));
 }
@@ -30,15 +35,19 @@ function publishLog(log) {
 async function init() {
     console.log('Executing script.js')
     publishLog('Build Started...')
+    // Get the output DIr
     const outDirPath = path.join(__dirname, 'output')
 
+    // Execute the function
     const p = exec(`cd ${outDirPath} && npm install && npm run build`)
 
+    // A Readable Stream that represents the child process's stdout.
     p.stdout.on('data', function (data) {
         console.log(data.toString())
         publishLog(data.toString())
     })
 
+    // A Readable Stream that represents the child process's stdout.
     p.stdout.on('error', function (data) {
         console.log('Error', data.toString())
         publishLog(`error: ${data.toString()}`)
@@ -58,6 +67,7 @@ async function init() {
             console.log('uploading', filePath)
             publishLog(`uploading ${file}`)
 
+            // upload the file one-one
             const command = new PutObjectCommand({
                 Bucket: 'notetaking123',
                 Key: `__outputs/${PROJECT_ID}/${file}`,
@@ -65,15 +75,20 @@ async function init() {
                 ContentType: mime.lookup(filePath)
             })
 
+            // Send the fiel
             await s3Client.send(command)
             publishLog(`uploaded ${file}`)
             console.log('uploaded', filePath)
         }
         publishLog(`Done`)
         console.log('Done...')
+
+        // Disconnect the Redis Server so that docker can shutdown :) 
         publisher.disconnect();
         console.log("Container Closed Successfully!!")
     })
 }
+
+// Call the function
 
 init()
