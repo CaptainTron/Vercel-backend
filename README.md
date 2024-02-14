@@ -3,7 +3,12 @@ This is Scalable Vercel backend Clone that takes following values as Environment
 - ```GIT_REPO_URL``` as github url to clone
 - ```PROJECT_ID``` as projectID
 
+
 ### How to start ?
+- Clone this Repo
+- Start your Docker
+- In ```build-server``` create a ```.env``` file and save above environment variable.
+- start both servers.
 - Go to postman hit ```POST``` Request with following URL ```http://localhost:5000/project```
   - BODY
     - ```GitURL``` which specifies the url of Github page you want to publish
