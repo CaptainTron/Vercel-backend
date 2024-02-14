@@ -14,4 +14,6 @@ This is Scalable Vercel backend Clone that takes following values as Environment
 ![Screenshot 2024-02-14 103354](https://github.com/CaptainTron/Vercel-backend/assets/94986377/df4043fe-1b07-499c-abd3-96c0142d7a78)
 
 
-This project uses of AWS ECS, ECR, S3, REDIS, Docker, socket.io as Techstack. 
+This project uses of AWS ECS, ECR, S3, REDIS, Docker, socket.io as Techstack.   
+### Architecture
+![image](https://github.com/CaptainTron/Vercel-backend/assets/94986377/861f7d49-3113-41ed-95bb-5a57751e8a5e)
