@@ -7,7 +7,7 @@ const { ECSClient, RunTaskCommand } = require("@aws-sdk/client-ecs")
 const { Server } = require('socket.io')
 const Redis = require('ioredis')
 
-const subscriber = new Redis("<< REDIS URL GOES HERE >>")
+const subscriber = new Redis("<< REDIS URL GOES HERE >>");
 const io = new Server({ cors: '*' });
 
 
