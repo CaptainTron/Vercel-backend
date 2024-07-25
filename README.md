@@ -1,5 +1,14 @@
 # Vercel-backend
-This README provides information about a Scalable Vercel backend Clone. The backend clone is designed to automatically build and deploy sites based on a given URL, such as a GitHub repository URL. The clone is built using various technologies, including AWS ECS, ECR, and S3, Redis, Docker, Socket.io, JavaScript, Express.js, and Node.js. It also utilizes a reverse-proxy.
+Vercel backend clone is designed to automatically build and deploy sites based on a given URL, such as a GitHub repository URL. The clone is built using various technologies, including 
+- AWS ECS, ECR, and S3,
+- Redis,
+- Docker,
+- Socket.io,
+- JavaScript,
+- Express.js,
+- Node.js.
+- reverse-proxy.
+
 
 
 ## Directory Structure
@@ -18,11 +27,11 @@ This README provides information about a Scalable Vercel backend Clone. The back
 │   ├── package.json
 │   └── script.js       - This Will build logs and publish it on redis server
 ├── s3-reverse-proxy
-│   ├── Dockerfile      - Dockerfile
-│   ├── index.js        - this will help us to view the webpage.
-│   ├── package-lock.json
-│   └── package.json
-└── structure.txt
+    ├── Dockerfile      - Dockerfile
+    ├── index.js        - this will help us to view the webpage.
+    ├── package-lock.json
+    └── package.json
+
 
 3 directories, 15 files
 ```
